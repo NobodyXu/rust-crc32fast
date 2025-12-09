@@ -19,9 +19,9 @@ const HAS_SSE: bool = cfg!(target_feature = "pclmulqdq")
 macro_rules! is_specialized_guaranteed_available {
     () => {
         all(
-            cfg(target_feature = "pclmulqdq")
-                && cfg(target_feature = "sse2")
-                && cfg(target_feature = "sse4.1")
+            target_feature = "pclmulqdq",
+            target_feature = "sse2",
+            target_feature = "sse4.1",
         )
     };
 }
