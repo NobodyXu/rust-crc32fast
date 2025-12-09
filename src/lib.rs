@@ -39,10 +39,11 @@
 use core::fmt;
 use core::hash;
 
-#[cfg(not(always_have_specialized))]
+#[cfg(any(not(always_have_specialized), test))]
 mod baseline;
 mod combine;
 mod specialized;
+#[cfg(any(not(always_have_specialized), test))]
 mod table;
 
 /// Computes the CRC32 hash of a byte slice.
