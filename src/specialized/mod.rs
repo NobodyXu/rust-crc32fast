@@ -11,7 +11,7 @@ cfg_if::cfg_if! {
     } else {
         macro_rules! is_specialized_guaranteed_available {
             () => {
-                cfg(false)
+                false
             };
         }
         pub use is_specialized_guaranteed_available;
