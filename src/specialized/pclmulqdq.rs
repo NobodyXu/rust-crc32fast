@@ -12,6 +12,12 @@ use core::arch::x86 as arch;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64 as arch;
 
+const HAS_SSE: bool = cfg!(all(
+    target_feature = "pclmulqdq",
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+));
+
 #[derive(Clone)]
 pub struct State {
     state: u32,
@@ -20,10 +26,7 @@ pub struct State {
 impl State {
     #[cfg(not(feature = "std"))]
     pub fn new(state: u32) -> Option<Self> {
-        if cfg!(target_feature = "pclmulqdq")
-            && cfg!(target_feature = "sse2")
-            && cfg!(target_feature = "sse4.1")
-        {
+        if HAS_SSE {
             // SAFETY: The conditions above ensure that all
             //         required instructions are supported by the CPU.
             Some(Self { state })
@@ -34,9 +37,12 @@ impl State {
 
     #[cfg(feature = "std")]
     pub fn new(state: u32) -> Option<Self> {
-        if is_x86_feature_detected!("pclmulqdq")
-            && is_x86_feature_detected!("sse2")
-            && is_x86_feature_detected!("sse4.1")
+        if HAS_SSE 
+            || (
+                is_x86_feature_detected!("pclmulqdq")
+                    && is_x86_feature_detected!("sse2")
+                    && is_x86_feature_detected!("sse4.1")
+            )
         {
             // SAFETY: The conditions above ensure that all
             //         required instructions are supported by the CPU.

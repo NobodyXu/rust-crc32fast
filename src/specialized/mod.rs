@@ -8,7 +8,7 @@ cfg_if::cfg_if! {
     } else if #[cfg(all(stable_arm_crc32_intrinsics, target_arch = "aarch64"))] {
         mod aarch64;
         pub use self::aarch64::State;
-    } else {
+    } else {      
         #[derive(Clone)]
         pub enum State {}
         impl State {

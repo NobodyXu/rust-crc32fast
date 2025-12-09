@@ -1,5 +1,7 @@
 use core::arch::aarch64 as arch;
 
+const HAS_CRC: bool = cfg!(target_feature = "crc");
+
 #[derive(Clone)]
 pub struct State {
     state: u32,
@@ -8,7 +10,7 @@ pub struct State {
 impl State {
     #[cfg(not(feature = "std"))]
     pub fn new(state: u32) -> Option<Self> {
-        if cfg!(target_feature = "crc") {
+        if HAS_CRC {
             // SAFETY: The conditions above ensure that all
             //         required instructions are supported by the CPU.
             Some(Self { state })
@@ -19,7 +21,7 @@ impl State {
 
     #[cfg(feature = "std")]
     pub fn new(state: u32) -> Option<Self> {
-        if std::arch::is_aarch64_feature_detected!("crc") {
+        if HAS_CRC || std::arch::is_aarch64_feature_detected!("crc") {
             // SAFETY: The conditions above ensure that all
             //         required instructions are supported by the CPU.
             Some(Self { state })
