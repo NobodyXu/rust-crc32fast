@@ -12,20 +12,11 @@ use core::arch::x86 as arch;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64 as arch;
 
-const HAS_SSE: bool = cfg!(target_feature = "pclmulqdq")
-    && cfg!(target_feature = "sse2")
-    && cfg!(target_feature = "sse4.1");
-
-macro_rules! is_specialized_guaranteed_available {
-    () => {
-        all(
-            target_feature = "pclmulqdq",
-            target_feature = "sse2",
-            target_feature = "sse4.1",
-        )
-    };
-}
-pub(crate) use is_specialized_guaranteed_available;
+const HAS_SSE: bool = cfg!(all(
+    target_feature = "pclmulqdq",
+    target_feature = "sse2",
+    target_feature = "sse4.1",
+));
 
 #[derive(Clone)]
 pub struct State {
