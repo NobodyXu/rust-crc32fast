@@ -2,13 +2,6 @@ use core::arch::aarch64 as arch;
 
 const HAS_CRC: bool = cfg!(target_feature = "crc");
 
-macro_rules! is_specialized_guaranteed_available {
-    () => {
-        target_feature = "crc"
-    };
-}
-pub(crate) use is_specialized_guaranteed_available;
-
 #[derive(Clone)]
 pub struct State {
     state: u32,
