@@ -4,11 +4,18 @@ cfg_if::cfg_if! {
         any(target_arch = "x86", target_arch = "x86_64")
     ))] {
         mod pclmulqdq;
-        pub use self::pclmulqdq::State;
+        pub use self::pclmulqdq::{State, is_specialized_guaranteed_available};
     } else if #[cfg(all(stable_arm_crc32_intrinsics, target_arch = "aarch64"))] {
         mod aarch64;
-        pub use self::aarch64::State;
+        pub use self::aarch64::{State, is_specialized_guaranteed_available};
     } else {
+        macro_rules! is_specialized_guaranteed_available {
+            () => {
+                cfg(false)
+            };
+        }
+        pub use is_specialized_guaranteed_available;
+        
         #[derive(Clone)]
         pub enum State {}
         impl State {
