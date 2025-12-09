@@ -42,6 +42,8 @@ pub(crate) fn combine(crc1: u32, crc2: u32, len2: u64) -> u32 {
 
 #[cfg(test)]
 mod test {
+    use super::*;
+
     #[test]
     fn golden() {
         assert_eq!(combine(0x0, 0x1, 0x0), 0x0);
