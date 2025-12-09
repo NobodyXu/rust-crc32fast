@@ -4,7 +4,7 @@ const HAS_CRC: bool = cfg!(target_feature = "crc");
 
 macro_rules! is_specialized_guaranteed_available {
     () => {
-        cfg(target_feature = "crc")
+        target_feature = "crc"
     };
 }
 pub(crate) use is_specialized_guaranteed_available;
