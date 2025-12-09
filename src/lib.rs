@@ -39,6 +39,7 @@
 use core::fmt;
 use core::hash;
 
+#[cfg(not(specialized::is_specialized_guaranteed_available!()))]
 mod baseline;
 mod combine;
 mod specialized;
@@ -55,6 +56,7 @@ pub fn hash(buf: &[u8]) -> u32 {
 
 #[derive(Clone)]
 enum State {
+    #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
     Baseline(baseline::State),
     Specialized(specialized::State),
 }
@@ -91,11 +93,16 @@ impl Hasher {
     /// resulting object can then be used with `combine` to compute `crc(a ||
     /// b)` from `crc(a)`, `crc(b)`, and `len(b)`.
     pub fn new_with_initial_len(init: u32, amount: u64) -> Self {
-        Self::internal_new_specialized(init, amount)
-            .unwrap_or_else(|| Self::internal_new_baseline(init, amount))
+        #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
+        return Self::internal_new_specialized(init, amount)
+            .unwrap_or_else(|| Self::internal_new_baseline(init, amount));
+
+        #[cfg(specialized::is_specialized_guaranteed_available!())]
+        Self::internal_new_specialized(init, amount).unwrap()
     }
 
     #[doc(hidden)]
+    #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
     // Internal-only API. Don't use.
     pub fn internal_new_baseline(init: u32, amount: u64) -> Self {
         Hasher {
@@ -122,6 +129,7 @@ impl Hasher {
     pub fn update(&mut self, buf: &[u8]) {
         self.amount += buf.len() as u64;
         match self.state {
+            #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
             State::Baseline(ref mut state) => state.update(buf),
             State::Specialized(ref mut state) => state.update(buf),
         }
@@ -130,6 +138,7 @@ impl Hasher {
     /// Finalize the hash state and return the computed CRC32 value.
     pub fn finalize(self) -> u32 {
         match self.state {
+            #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
             State::Baseline(state) => state.finalize(),
             State::Specialized(state) => state.finalize(),
         }
@@ -139,6 +148,7 @@ impl Hasher {
     pub fn reset(&mut self) {
         self.amount = 0;
         match self.state {
+            #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
             State::Baseline(ref mut state) => state.reset(),
             State::Specialized(ref mut state) => state.reset(),
         }
@@ -149,6 +159,7 @@ impl Hasher {
         self.amount += other.amount;
         let other_crc = other.clone().finalize();
         match self.state {
+            #[cfg(not(specialized::is_specialized_guaranteed_available!()))]
             State::Baseline(ref mut state) => state.combine(other_crc, other.amount),
             State::Specialized(ref mut state) => state.combine(other_crc, other.amount),
         }
